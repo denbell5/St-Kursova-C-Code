@@ -1,0 +1,1157 @@
+
+Atmega8-i2c_3.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000054e  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000005a2  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000005a2  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000005d4  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000228  00000000  00000000  00000610  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   000025cf  00000000  00000000  00000838  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000ef6  00000000  00000000  00002e07  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   0000130d  00000000  00000000  00003cfd  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000590  00000000  00000000  0000500c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000a70  00000000  00000000  0000559c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00001d17  00000000  00000000  0000600c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 000001c0  00000000  00000000  00007d23  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	d4 d1       	rcall	.+936    	; 0x3dc <main>
+  34:	8a c2       	rjmp	.+1300   	; 0x54a <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <_Z21ds1307_read_time_datePh>:
+#include "main.h"
+
+// чтение даты и времени из микросхемы в массив.
+uint8_t ds1307_read_time_date(uint8_t *massiv)
+{
+  38:	af 92       	push	r10
+  3a:	bf 92       	push	r11
+  3c:	cf 92       	push	r12
+  3e:	df 92       	push	r13
+  40:	ef 92       	push	r14
+  42:	ff 92       	push	r15
+  44:	0f 93       	push	r16
+  46:	1f 93       	push	r17
+  48:	cf 93       	push	r28
+  4a:	8c 01       	movw	r16, r24
+	uint8_t status;
+	status=i2c_start();
+  4c:	c2 d0       	rcall	.+388    	; 0x1d2 <_Z9i2c_startv>
+  4e:	c8 2f       	mov	r28, r24
+	if (status==TWI_OK)
+  50:	8f 3f       	cpi	r24, 0xFF	; 255
+  52:	09 f0       	breq	.+2      	; 0x56 <__SREG__+0x17>
+  54:	45 c0       	rjmp	.+138    	; 0xe0 <__SREG__+0xa1>
+	{
+		status=i2c_send_addr(DS1307_WRITE); // сначала адрес на запись чтобы передать регистр
+  56:	80 ed       	ldi	r24, 0xD0	; 208
+  58:	cd d0       	rcall	.+410    	; 0x1f4 <_Z13i2c_send_addrh>
+  5a:	c8 2f       	mov	r28, r24
+		if (status==TWI_OK)
+  5c:	8f 3f       	cpi	r24, 0xFF	; 255
+  5e:	09 f0       	breq	.+2      	; 0x62 <__SREG__+0x23>
+  60:	3f c0       	rjmp	.+126    	; 0xe0 <__SREG__+0xa1>
+		{
+			status=i2c_send_byte(SEC_ADDR);// начинаем с адреса регистра секунд
+  62:	80 e0       	ldi	r24, 0x00	; 0
+  64:	da d0       	rcall	.+436    	; 0x21a <_Z13i2c_send_byteh>
+  66:	c8 2f       	mov	r28, r24
+			if (status==TWI_OK)
+  68:	8f 3f       	cpi	r24, 0xFF	; 255
+  6a:	d1 f5       	brne	.+116    	; 0xe0 <__SREG__+0xa1>
+			{
+				status=i2c_start();
+  6c:	b2 d0       	rcall	.+356    	; 0x1d2 <_Z9i2c_startv>
+  6e:	c8 2f       	mov	r28, r24
+				if (status==TWI_OK)
+  70:	8f 3f       	cpi	r24, 0xFF	; 255
+  72:	b1 f5       	brne	.+108    	; 0xe0 <__SREG__+0xa1>
+				{
+					status=i2c_send_addr(DS1307_READ);// переключаемся на чтение
+  74:	81 ed       	ldi	r24, 0xD1	; 209
+  76:	be d0       	rcall	.+380    	; 0x1f4 <_Z13i2c_send_addrh>
+  78:	c8 2f       	mov	r28, r24
+					if (status==TWI_OK)
+  7a:	8f 3f       	cpi	r24, 0xFF	; 255
+  7c:	89 f5       	brne	.+98     	; 0xe0 <__SREG__+0xa1>
+  7e:	78 01       	movw	r14, r16
+  80:	58 01       	movw	r10, r16
+  82:	26 e0       	ldi	r18, 0x06	; 6
+  84:	a2 0e       	add	r10, r18
+  86:	b1 1c       	adc	r11, r1
+  88:	65 01       	movw	r12, r10
+					{
+						for (uint8_t i=0; i<6; i++)// 6 байт с аск
+						{
+							status=i2c_read_byte(&massiv[i],1);
+  8a:	61 e0       	ldi	r22, 0x01	; 1
+  8c:	c7 01       	movw	r24, r14
+  8e:	d3 d0       	rcall	.+422    	; 0x236 <_Z13i2c_read_bytePhh>
+  90:	c8 2f       	mov	r28, r24
+							massiv[i] = bcd2dec(massiv[i]);
+  92:	f7 01       	movw	r30, r14
+  94:	20 81       	ld	r18, Z
+  96:	82 2f       	mov	r24, r18
+  98:	90 e0       	ldi	r25, 0x00	; 0
+  9a:	95 95       	asr	r25
+  9c:	87 95       	ror	r24
+  9e:	95 95       	asr	r25
+  a0:	87 95       	ror	r24
+  a2:	95 95       	asr	r25
+  a4:	87 95       	ror	r24
+  a6:	95 95       	asr	r25
+  a8:	87 95       	ror	r24
+  aa:	98 2f       	mov	r25, r24
+  ac:	99 0f       	add	r25, r25
+  ae:	89 0f       	add	r24, r25
+  b0:	88 0f       	add	r24, r24
+  b2:	28 1b       	sub	r18, r24
+  b4:	21 93       	st	Z+, r18
+  b6:	7f 01       	movw	r14, r30
+							if (status!=TWI_OK) break;
+  b8:	cf 3f       	cpi	r28, 0xFF	; 255
+  ba:	91 f4       	brne	.+36     	; 0xe0 <__SREG__+0xa1>
+				if (status==TWI_OK)
+				{
+					status=i2c_send_addr(DS1307_READ);// переключаемся на чтение
+					if (status==TWI_OK)
+					{
+						for (uint8_t i=0; i<6; i++)// 6 байт с аск
+  bc:	ce 16       	cp	r12, r30
+  be:	df 06       	cpc	r13, r31
+  c0:	21 f7       	brne	.-56     	; 0x8a <__SREG__+0x4b>
+							massiv[i] = bcd2dec(massiv[i]);
+							if (status!=TWI_OK) break;
+						}
+						if (status==TWI_OK)
+						{
+							status=i2c_read_byte(&massiv[6],0);// последний без аск
+  c2:	60 e0       	ldi	r22, 0x00	; 0
+  c4:	c5 01       	movw	r24, r10
+  c6:	b7 d0       	rcall	.+366    	; 0x236 <_Z13i2c_read_bytePhh>
+  c8:	c8 2f       	mov	r28, r24
+							massiv[6]= bcd2dec(massiv[6]);
+  ca:	f8 01       	movw	r30, r16
+  cc:	86 81       	ldd	r24, Z+6	; 0x06
+  ce:	98 2f       	mov	r25, r24
+  d0:	92 95       	swap	r25
+  d2:	9f 70       	andi	r25, 0x0F	; 15
+  d4:	f6 e0       	ldi	r31, 0x06	; 6
+  d6:	9f 9f       	mul	r25, r31
+  d8:	80 19       	sub	r24, r0
+  da:	11 24       	eor	r1, r1
+  dc:	f8 01       	movw	r30, r16
+  de:	86 83       	std	Z+6, r24	; 0x06
+					}
+				}
+			}
+		}
+	}
+	i2c_stop();
+  e0:	86 d0       	rcall	.+268    	; 0x1ee <_Z8i2c_stopv>
+	return status;
+}
+  e2:	8c 2f       	mov	r24, r28
+  e4:	cf 91       	pop	r28
+  e6:	1f 91       	pop	r17
+  e8:	0f 91       	pop	r16
+  ea:	ff 90       	pop	r15
+  ec:	ef 90       	pop	r14
+  ee:	df 90       	pop	r13
+  f0:	cf 90       	pop	r12
+  f2:	bf 90       	pop	r11
+  f4:	af 90       	pop	r10
+  f6:	08 95       	ret
+
+000000f8 <_Z14eep_write_bytejh>:
+#include "main.h"
+
+// запись байта
+uint8_t eep_write_byte(uint16_t address,uint8_t byte) {
+  f8:	0f 93       	push	r16
+  fa:	1f 93       	push	r17
+  fc:	cf 93       	push	r28
+  fe:	df 93       	push	r29
+ 100:	18 2f       	mov	r17, r24
+ 102:	d9 2f       	mov	r29, r25
+ 104:	06 2f       	mov	r16, r22
+	uint8_t status;
+	status=i2c_start();
+ 106:	65 d0       	rcall	.+202    	; 0x1d2 <_Z9i2c_startv>
+ 108:	c8 2f       	mov	r28, r24
+
+	if (status==TWI_OK)
+ 10a:	8f 3f       	cpi	r24, 0xFF	; 255
+ 10c:	99 f4       	brne	.+38     	; 0x134 <_Z14eep_write_bytejh+0x3c>
+	{
+		status=i2c_send_addr(EEP24C_WRITE);
+ 10e:	8e ea       	ldi	r24, 0xAE	; 174
+ 110:	71 d0       	rcall	.+226    	; 0x1f4 <_Z13i2c_send_addrh>
+ 112:	c8 2f       	mov	r28, r24
+
+		if (status==TWI_OK)
+ 114:	8f 3f       	cpi	r24, 0xFF	; 255
+ 116:	69 f4       	brne	.+26     	; 0x132 <_Z14eep_write_bytejh+0x3a>
+		{
+			status=i2c_send_byte(address>>8); // старшие 8 бит
+ 118:	8d 2f       	mov	r24, r29
+ 11a:	7f d0       	rcall	.+254    	; 0x21a <_Z13i2c_send_byteh>
+ 11c:	c8 2f       	mov	r28, r24
+
+			if (status==TWI_OK)
+ 11e:	8f 3f       	cpi	r24, 0xFF	; 255
+ 120:	41 f4       	brne	.+16     	; 0x132 <_Z14eep_write_bytejh+0x3a>
+			{
+				status=i2c_send_byte(address); // младшие 8 бит
+ 122:	81 2f       	mov	r24, r17
+ 124:	7a d0       	rcall	.+244    	; 0x21a <_Z13i2c_send_byteh>
+ 126:	c8 2f       	mov	r28, r24
+
+				if (status==TWI_OK)
+ 128:	8f 3f       	cpi	r24, 0xFF	; 255
+ 12a:	19 f4       	brne	.+6      	; 0x132 <_Z14eep_write_bytejh+0x3a>
+				{
+					status=i2c_send_byte(byte); // отправка байта
+ 12c:	80 2f       	mov	r24, r16
+ 12e:	75 d0       	rcall	.+234    	; 0x21a <_Z13i2c_send_byteh>
+ 130:	c8 2f       	mov	r28, r24
+
+				}
+			}
+		}
+		i2c_stop();
+ 132:	5d d0       	rcall	.+186    	; 0x1ee <_Z8i2c_stopv>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 134:	81 ee       	ldi	r24, 0xE1	; 225
+ 136:	94 e0       	ldi	r25, 0x04	; 4
+ 138:	01 97       	sbiw	r24, 0x01	; 1
+ 13a:	f1 f7       	brne	.-4      	; 0x138 <_Z14eep_write_bytejh+0x40>
+ 13c:	00 c0       	rjmp	.+0      	; 0x13e <_Z14eep_write_bytejh+0x46>
+ 13e:	00 00       	nop
+	}
+	_delay_ms(5);
+	return status;
+}
+ 140:	8c 2f       	mov	r24, r28
+ 142:	df 91       	pop	r29
+ 144:	cf 91       	pop	r28
+ 146:	1f 91       	pop	r17
+ 148:	0f 91       	pop	r16
+ 14a:	08 95       	ret
+
+0000014c <_Z11fcd_write16hj>:
+	status = i2c_read_byte(&MLSB[1], 0);
+	_delay_ms(100);				
+
+	i2c_stop();
+	return status;
+}
+ 14c:	0f 93       	push	r16
+ 14e:	1f 93       	push	r17
+ 150:	cf 93       	push	r28
+ 152:	df 93       	push	r29
+ 154:	d8 2f       	mov	r29, r24
+ 156:	06 2f       	mov	r16, r22
+ 158:	17 2f       	mov	r17, r23
+ 15a:	3b d0       	rcall	.+118    	; 0x1d2 <_Z9i2c_startv>
+ 15c:	c8 2f       	mov	r28, r24
+ 15e:	8f 3f       	cpi	r24, 0xFF	; 255
+ 160:	91 f4       	brne	.+36     	; 0x186 <_Z11fcd_write16hj+0x3a>
+ 162:	80 ea       	ldi	r24, 0xA0	; 160
+ 164:	47 d0       	rcall	.+142    	; 0x1f4 <_Z13i2c_send_addrh>
+ 166:	c8 2f       	mov	r28, r24
+ 168:	8f 3f       	cpi	r24, 0xFF	; 255
+ 16a:	69 f4       	brne	.+26     	; 0x186 <_Z11fcd_write16hj+0x3a>
+ 16c:	8d 2f       	mov	r24, r29
+ 16e:	55 d0       	rcall	.+170    	; 0x21a <_Z13i2c_send_byteh>
+ 170:	c8 2f       	mov	r28, r24
+ 172:	8f 3f       	cpi	r24, 0xFF	; 255
+ 174:	41 f4       	brne	.+16     	; 0x186 <_Z11fcd_write16hj+0x3a>
+ 176:	81 2f       	mov	r24, r17
+ 178:	50 d0       	rcall	.+160    	; 0x21a <_Z13i2c_send_byteh>
+ 17a:	c8 2f       	mov	r28, r24
+ 17c:	8f 3f       	cpi	r24, 0xFF	; 255
+ 17e:	19 f4       	brne	.+6      	; 0x186 <_Z11fcd_write16hj+0x3a>
+ 180:	80 2f       	mov	r24, r16
+ 182:	4b d0       	rcall	.+150    	; 0x21a <_Z13i2c_send_byteh>
+ 184:	c8 2f       	mov	r28, r24
+ 186:	33 d0       	rcall	.+102    	; 0x1ee <_Z8i2c_stopv>
+ 188:	8c 2f       	mov	r24, r28
+ 18a:	df 91       	pop	r29
+ 18c:	cf 91       	pop	r28
+ 18e:	1f 91       	pop	r17
+ 190:	0f 91       	pop	r16
+ 192:	08 95       	ret
+
+00000194 <_Z12FDC1004_readh>:
+
+uint16_t FDC1004_read(uint8_t reg) {
+ 194:	cf 93       	push	r28
+ 196:	df 93       	push	r29
+ 198:	c8 2f       	mov	r28, r24
+	// Write register address into register pointer
+	i2c_start();
+ 19a:	1b d0       	rcall	.+54     	; 0x1d2 <_Z9i2c_startv>
+	i2c_send_addr(FCD1004_WRITE);
+ 19c:	80 ea       	ldi	r24, 0xA0	; 160
+ 19e:	2a d0       	rcall	.+84     	; 0x1f4 <_Z13i2c_send_addrh>
+	i2c_send_byte(reg);
+ 1a0:	8c 2f       	mov	r24, r28
+ 1a2:	3b d0       	rcall	.+118    	; 0x21a <_Z13i2c_send_byteh>
+
+	// Actually read the data back
+	uint16_t data = 0;
+	i2c_start();
+ 1a4:	16 d0       	rcall	.+44     	; 0x1d2 <_Z9i2c_startv>
+	i2c_send_addr(FCD1004_READ);
+ 1a6:	81 ea       	ldi	r24, 0xA1	; 161
+ 1a8:	25 d0       	rcall	.+74     	; 0x1f4 <_Z13i2c_send_addrh>
+	//_delay_ms(1000);
+	data  = ((uint16_t)i2c_readAck()) << 8;
+ 1aa:	74 d0       	rcall	.+232    	; 0x294 <_Z11i2c_readAckv>
+ 1ac:	c8 2f       	mov	r28, r24
+ 1ae:	d0 e0       	ldi	r29, 0x00	; 0
+ 1b0:	dc 2f       	mov	r29, r28
+ 1b2:	cc 27       	eor	r28, r28
+	//_delay_ms(1000);
+	data |= i2c_readNak();
+ 1b4:	76 d0       	rcall	.+236    	; 0x2a2 <_Z11i2c_readNakv>
+ 1b6:	c8 2b       	or	r28, r24
+	//_delay_ms(1000);
+	i2c_stop();
+ 1b8:	1a d0       	rcall	.+52     	; 0x1ee <_Z8i2c_stopv>
+	return data;
+}
+ 1ba:	ce 01       	movw	r24, r28
+ 1bc:	df 91       	pop	r29
+ 1be:	cf 91       	pop	r28
+ 1c0:	08 95       	ret
+
+000001c2 <_Z8i2c_initv>:
+#include "main.h"
+
+// инициализация
+void i2c_init(void) {
+	TWSR = 0; // для простоты расчетов 0.
+ 1c2:	11 b8       	out	0x01, r1	; 1
+	TWBR = ((F_CPU/I2C_SPEED)-16)/2;  // рассчитываем значение регистра TWBR
+ 1c4:	8a e2       	ldi	r24, 0x2A	; 42
+ 1c6:	80 b9       	out	0x00, r24	; 0
+ 1c8:	08 95       	ret
+
+000001ca <_Z8i2c_waitv>:
+}
+
+// ожидание
+void i2c_wait(void)
+{
+	while (!(TWCR & (1<<TWINT)));
+ 1ca:	06 b6       	in	r0, 0x36	; 54
+ 1cc:	07 fe       	sbrs	r0, 7
+ 1ce:	fd cf       	rjmp	.-6      	; 0x1ca <_Z8i2c_waitv>
+}
+ 1d0:	08 95       	ret
+
+000001d2 <_Z9i2c_startv>:
+// старт
+uint8_t i2c_start(void)
+{
+	uint8_t status = TWI_OK;
+	
+	TWCR = (1<<TWEN)|(1<<TWINT)|(1<<TWSTA);
+ 1d2:	84 ea       	ldi	r24, 0xA4	; 164
+ 1d4:	86 bf       	out	0x36, r24	; 54
+	i2c_wait();
+ 1d6:	f9 df       	rcall	.-14     	; 0x1ca <_Z8i2c_waitv>
+	status = TWSR & TWSR_MASK;
+ 1d8:	81 b1       	in	r24, 0x01	; 1
+ 1da:	88 7f       	andi	r24, 0xF8	; 248
+	if ((status != TWI_START) && (status != TWI_REP_START)){
+ 1dc:	88 30       	cpi	r24, 0x08	; 8
+ 1de:	19 f0       	breq	.+6      	; 0x1e6 <_Z9i2c_startv+0x14>
+ 1e0:	80 31       	cpi	r24, 0x10	; 16
+ 1e2:	19 f0       	breq	.+6      	; 0x1ea <_Z9i2c_startv+0x18>
+ 1e4:	08 95       	ret
+		return status;
+	}
+	return TWI_OK;
+ 1e6:	8f ef       	ldi	r24, 0xFF	; 255
+ 1e8:	08 95       	ret
+ 1ea:	8f ef       	ldi	r24, 0xFF	; 255
+}
+ 1ec:	08 95       	ret
+
+000001ee <_Z8i2c_stopv>:
+
+// стоп
+void i2c_stop(void)
+{
+	TWCR = (1<<TWEN)|(1<<TWINT)|(1<<TWSTO);
+ 1ee:	84 e9       	ldi	r24, 0x94	; 148
+ 1f0:	86 bf       	out	0x36, r24	; 54
+ 1f2:	08 95       	ret
+
+000001f4 <_Z13i2c_send_addrh>:
+}
+
+// отправка адреса
+uint8_t i2c_send_addr(uint8_t address)
+{
+ 1f4:	cf 93       	push	r28
+ 1f6:	c8 2f       	mov	r28, r24
+	uint8_t status;
+	
+	i2c_wait();
+ 1f8:	e8 df       	rcall	.-48     	; 0x1ca <_Z8i2c_waitv>
+	TWDR = address;
+ 1fa:	c3 b9       	out	0x03, r28	; 3
+	TWCR = (1<<TWINT)|(1<<TWEN);
+ 1fc:	84 e8       	ldi	r24, 0x84	; 132
+ 1fe:	86 bf       	out	0x36, r24	; 54
+	i2c_wait();
+ 200:	e4 df       	rcall	.-56     	; 0x1ca <_Z8i2c_waitv>
+	status = TWSR & TWSR_MASK;
+ 202:	81 b1       	in	r24, 0x01	; 1
+ 204:	88 7f       	andi	r24, 0xF8	; 248
+	if ((status != TWI_MTX_ADR_ACK) && (status != TWI_MRX_ADR_ACK)){
+ 206:	88 31       	cpi	r24, 0x18	; 24
+ 208:	19 f0       	breq	.+6      	; 0x210 <_Z13i2c_send_addrh+0x1c>
+ 20a:	80 34       	cpi	r24, 0x40	; 64
+ 20c:	19 f0       	breq	.+6      	; 0x214 <_Z13i2c_send_addrh+0x20>
+ 20e:	03 c0       	rjmp	.+6      	; 0x216 <_Z13i2c_send_addrh+0x22>
+		return status;
+	}
+	return TWI_OK;
+ 210:	8f ef       	ldi	r24, 0xFF	; 255
+ 212:	01 c0       	rjmp	.+2      	; 0x216 <_Z13i2c_send_addrh+0x22>
+ 214:	8f ef       	ldi	r24, 0xFF	; 255
+}
+ 216:	cf 91       	pop	r28
+ 218:	08 95       	ret
+
+0000021a <_Z13i2c_send_byteh>:
+
+// отправка байта
+uint8_t i2c_send_byte(uint8_t byte)
+{
+ 21a:	cf 93       	push	r28
+ 21c:	c8 2f       	mov	r28, r24
+	uint8_t status;
+	
+	i2c_wait();
+ 21e:	d5 df       	rcall	.-86     	; 0x1ca <_Z8i2c_waitv>
+	TWDR = byte;
+ 220:	c3 b9       	out	0x03, r28	; 3
+	TWCR = (1<<TWINT)|(1<<TWEN);
+ 222:	84 e8       	ldi	r24, 0x84	; 132
+ 224:	86 bf       	out	0x36, r24	; 54
+	i2c_wait();
+ 226:	d1 df       	rcall	.-94     	; 0x1ca <_Z8i2c_waitv>
+	status = TWSR & TWSR_MASK;
+ 228:	81 b1       	in	r24, 0x01	; 1
+ 22a:	88 7f       	andi	r24, 0xF8	; 248
+	if (status != TWI_MTX_DATA_ACK){
+ 22c:	88 32       	cpi	r24, 0x28	; 40
+ 22e:	09 f4       	brne	.+2      	; 0x232 <_Z13i2c_send_byteh+0x18>
+		return status;
+	}
+	return TWI_OK;
+ 230:	8f ef       	ldi	r24, 0xFF	; 255
+}
+ 232:	cf 91       	pop	r28
+ 234:	08 95       	ret
+
+00000236 <_Z13i2c_read_bytePhh>:
+
+// чтение байта. ack=0/1 - NACK/ACK
+uint8_t i2c_read_byte(uint8_t *byte, uint8_t ack)
+{
+ 236:	ef 92       	push	r14
+ 238:	ff 92       	push	r15
+ 23a:	1f 93       	push	r17
+ 23c:	cf 93       	push	r28
+ 23e:	df 93       	push	r29
+ 240:	7c 01       	movw	r14, r24
+ 242:	16 2f       	mov	r17, r22
+	uint8_t status;
+	
+	i2c_wait();
+ 244:	c2 df       	rcall	.-124    	; 0x1ca <_Z8i2c_waitv>
+	TWCR = (1<<TWINT)|(1<<TWEN)|((ack & 1) << TWEA);
+ 246:	81 2f       	mov	r24, r17
+ 248:	81 70       	andi	r24, 0x01	; 1
+ 24a:	c8 2f       	mov	r28, r24
+ 24c:	e0 e0       	ldi	r30, 0x00	; 0
+ 24e:	de 2f       	mov	r29, r30
+ 250:	00 24       	eor	r0, r0
+ 252:	d6 95       	lsr	r29
+ 254:	c7 95       	ror	r28
+ 256:	07 94       	ror	r0
+ 258:	d6 95       	lsr	r29
+ 25a:	c7 95       	ror	r28
+ 25c:	07 94       	ror	r0
+ 25e:	dc 2f       	mov	r29, r28
+ 260:	c0 2d       	mov	r28, r0
+ 262:	c4 68       	ori	r28, 0x84	; 132
+ 264:	c6 bf       	out	0x36, r28	; 54
+	i2c_wait();
+ 266:	b1 df       	rcall	.-158    	; 0x1ca <_Z8i2c_waitv>
+	*byte = TWDR;
+ 268:	83 b1       	in	r24, 0x03	; 3
+ 26a:	f7 01       	movw	r30, r14
+ 26c:	80 83       	st	Z, r24
+	status = TWSR & TWSR_MASK;
+ 26e:	81 b1       	in	r24, 0x01	; 1
+ 270:	88 7f       	andi	r24, 0xF8	; 248
+	
+	if ((ack && (status != TWI_MRX_DATA_ACK))||(!ack && (status != TWI_MRX_DATA_NACK))){
+ 272:	11 23       	and	r17, r17
+ 274:	19 f0       	breq	.+6      	; 0x27c <_Z13i2c_read_bytePhh+0x46>
+ 276:	80 35       	cpi	r24, 0x50	; 80
+ 278:	21 f0       	breq	.+8      	; 0x282 <_Z13i2c_read_bytePhh+0x4c>
+ 27a:	06 c0       	rjmp	.+12     	; 0x288 <_Z13i2c_read_bytePhh+0x52>
+ 27c:	88 35       	cpi	r24, 0x58	; 88
+ 27e:	19 f0       	breq	.+6      	; 0x286 <_Z13i2c_read_bytePhh+0x50>
+ 280:	03 c0       	rjmp	.+6      	; 0x288 <_Z13i2c_read_bytePhh+0x52>
+		return status;
+	}
+	return TWI_OK;
+ 282:	8f ef       	ldi	r24, 0xFF	; 255
+ 284:	01 c0       	rjmp	.+2      	; 0x288 <_Z13i2c_read_bytePhh+0x52>
+ 286:	8f ef       	ldi	r24, 0xFF	; 255
+}
+ 288:	df 91       	pop	r29
+ 28a:	cf 91       	pop	r28
+ 28c:	1f 91       	pop	r17
+ 28e:	ff 90       	pop	r15
+ 290:	ef 90       	pop	r14
+ 292:	08 95       	ret
+
+00000294 <_Z11i2c_readAckv>:
+
+unsigned char i2c_readAck(void) {
+	TWCR = (1 << TWINT) | (1 << TWEN) | (1 << TWEA);
+ 294:	84 ec       	ldi	r24, 0xC4	; 196
+ 296:	86 bf       	out	0x36, r24	; 54
+	while (!(TWCR & (1 << TWINT))) {
+ 298:	06 b6       	in	r0, 0x36	; 54
+ 29a:	07 fe       	sbrs	r0, 7
+ 29c:	fd cf       	rjmp	.-6      	; 0x298 <_Z11i2c_readAckv+0x4>
+	}
+
+	return TWDR;
+ 29e:	83 b1       	in	r24, 0x03	; 3
+}
+ 2a0:	08 95       	ret
+
+000002a2 <_Z11i2c_readNakv>:
+
+unsigned char i2c_readNak(void) {
+	TWCR = (1 << TWINT) | (1 << TWEN);
+ 2a2:	84 e8       	ldi	r24, 0x84	; 132
+ 2a4:	86 bf       	out	0x36, r24	; 54
+	while (!(TWCR & (1 << TWINT))) {
+ 2a6:	06 b6       	in	r0, 0x36	; 54
+ 2a8:	07 fe       	sbrs	r0, 7
+ 2aa:	fd cf       	rjmp	.-6      	; 0x2a6 <_Z11i2c_readNakv+0x4>
+	}
+	
+	return TWDR;
+ 2ac:	83 b1       	in	r24, 0x03	; 3
+ 2ae:	08 95       	ret
+
+000002b0 <_Z13iEEPROM_writejh>:
+ */ 
+#include "main.h"
+
+void iEEPROM_write(uint16_t uiAddress, uint8_t ucData)
+{
+	while(EECR & (1<<EEWE)) //ждем освобождения флага окончания последней операцией с памятью
+ 2b0:	e1 99       	sbic	0x1c, 1	; 28
+ 2b2:	fe cf       	rjmp	.-4      	; 0x2b0 <_Z13iEEPROM_writejh>
+	{}
+	EEAR = uiAddress; //Устанавливаем адрес
+ 2b4:	9f bb       	out	0x1f, r25	; 31
+ 2b6:	8e bb       	out	0x1e, r24	; 30
+	EEDR = ucData; //Пищем данные в регистр
+ 2b8:	6d bb       	out	0x1d, r22	; 29
+	EECR |= (1<<EEMWE); //Разрешаем запись
+ 2ba:	e2 9a       	sbi	0x1c, 2	; 28
+	EECR |= (1<<EEWE); //Пишем байт в память
+ 2bc:	e1 9a       	sbi	0x1c, 1	; 28
+ 2be:	08 95       	ret
+
+000002c0 <_Z15iEEPROM_write16jj>:
+}
+
+void iEEPROM_write16(uint16_t uiAddress, uint16_t ucData)
+{
+ 2c0:	1f 93       	push	r17
+ 2c2:	cf 93       	push	r28
+ 2c4:	df 93       	push	r29
+ 2c6:	ec 01       	movw	r28, r24
+ 2c8:	16 2f       	mov	r17, r22
+ 2ca:	67 2f       	mov	r22, r23
+	iEEPROM_write(uiAddress, (uint8_t)(ucData >> 8));
+ 2cc:	f1 df       	rcall	.-30     	; 0x2b0 <_Z13iEEPROM_writejh>
+	iEEPROM_write(uiAddress+1, (uint8_t)ucData);	
+ 2ce:	61 2f       	mov	r22, r17
+ 2d0:	ce 01       	movw	r24, r28
+ 2d2:	01 96       	adiw	r24, 0x01	; 1
+ 2d4:	ed df       	rcall	.-38     	; 0x2b0 <_Z13iEEPROM_writejh>
+}
+ 2d6:	df 91       	pop	r29
+ 2d8:	cf 91       	pop	r28
+ 2da:	1f 91       	pop	r17
+ 2dc:	08 95       	ret
+
+000002de <_Z12iEEPROM_readj>:
+
+uint8_t iEEPROM_read(uint16_t uiAddress)
+{
+	while(EECR & (1<<EEWE))
+ 2de:	e1 99       	sbic	0x1c, 1	; 28
+ 2e0:	fe cf       	rjmp	.-4      	; 0x2de <_Z12iEEPROM_readj>
+	{} //ждем освобождения флага окончания последней операцией с памятью
+	EEAR = uiAddress; //Устанавливаем адрес
+ 2e2:	9f bb       	out	0x1f, r25	; 31
+ 2e4:	8e bb       	out	0x1e, r24	; 30
+	EECR |= (1<<EERE); //Запускаем операцию считывания из памяти в регистр данных
+ 2e6:	e0 9a       	sbi	0x1c, 0	; 28
+	return EEDR; //Возвращаем результат
+ 2e8:	8d b3       	in	r24, 0x1d	; 29
+}
+ 2ea:	08 95       	ret
+
+000002ec <_Z14iEEPROM_read16j>:
+
+uint16_t iEEPROM_read16(uint16_t uiAddress)
+{
+ 2ec:	0f 93       	push	r16
+ 2ee:	1f 93       	push	r17
+ 2f0:	cf 93       	push	r28
+ 2f2:	df 93       	push	r29
+ 2f4:	8c 01       	movw	r16, r24
+	uint16_t data;
+	data = iEEPROM_read(uiAddress);
+ 2f6:	f3 df       	rcall	.-26     	; 0x2de <_Z12iEEPROM_readj>
+ 2f8:	c8 2f       	mov	r28, r24
+ 2fa:	d0 e0       	ldi	r29, 0x00	; 0
+	data = data << 8;
+ 2fc:	dc 2f       	mov	r29, r28
+ 2fe:	cc 27       	eor	r28, r28
+	data |= iEEPROM_read(uiAddress+1);
+ 300:	c8 01       	movw	r24, r16
+ 302:	01 96       	adiw	r24, 0x01	; 1
+ 304:	ec df       	rcall	.-40     	; 0x2de <_Z12iEEPROM_readj>
+	
+	return data;
+ 306:	9e 01       	movw	r18, r28
+ 308:	28 2b       	or	r18, r24
+ 30a:	c9 01       	movw	r24, r18
+ 30c:	df 91       	pop	r29
+ 30e:	cf 91       	pop	r28
+ 310:	1f 91       	pop	r17
+ 312:	0f 91       	pop	r16
+ 314:	08 95       	ret
+
+00000316 <_Z24IncludeTemperatureOffsethj>:
+	}
+	else
+	{
+		return false;
+	}
+}
+ 316:	88 23       	and	r24, r24
+ 318:	14 f0       	brlt	.+4      	; 0x31e <_Z24IncludeTemperatureOffsethj+0x8>
+ 31a:	84 31       	cpi	r24, 0x14	; 20
+ 31c:	18 f4       	brcc	.+6      	; 0x324 <_Z24IncludeTemperatureOffsethj+0xe>
+ 31e:	cb 01       	movw	r24, r22
+ 320:	02 97       	sbiw	r24, 0x02	; 2
+ 322:	08 95       	ret
+ 324:	93 ec       	ldi	r25, 0xC3	; 195
+ 326:	98 0f       	add	r25, r24
+ 328:	97 32       	cpi	r25, 0x27	; 39
+ 32a:	18 f4       	brcc	.+6      	; 0x332 <_Z24IncludeTemperatureOffsethj+0x1c>
+ 32c:	cb 01       	movw	r24, r22
+ 32e:	02 96       	adiw	r24, 0x02	; 2
+ 330:	08 95       	ret
+ 332:	85 36       	cpi	r24, 0x65	; 101
+ 334:	18 f0       	brcs	.+6      	; 0x33c <_Z24IncludeTemperatureOffsethj+0x26>
+ 336:	cb 01       	movw	r24, r22
+ 338:	04 97       	sbiw	r24, 0x04	; 4
+ 33a:	08 95       	ret
+ 33c:	cb 01       	movw	r24, r22
+ 33e:	08 95       	ret
+
+00000340 <_Z20CalculateCapacitancejj>:
+uint16_t CalculateCapacitance(uint16_t data1, uint16_t data2)
+{
+ 340:	0f 93       	push	r16
+ 342:	1f 93       	push	r17
+ 344:	8b 01       	movw	r16, r22
+	uint16_t a = 0x8000; // для проверки знака (в 23 разряде 1 бит, все остальные 0)
+	uint32_t data;
+	
+	// сложение старших и младших бит
+	data = data1;
+ 346:	ac 01       	movw	r20, r24
+ 348:	60 e0       	ldi	r22, 0x00	; 0
+ 34a:	70 e0       	ldi	r23, 0x00	; 0
+	data = data << 16;
+ 34c:	ba 01       	movw	r22, r20
+ 34e:	55 27       	eor	r21, r21
+ 350:	44 27       	eor	r20, r20
+	data |= data2;
+ 352:	20 e0       	ldi	r18, 0x00	; 0
+ 354:	30 e0       	ldi	r19, 0x00	; 0
+ 356:	40 2b       	or	r20, r16
+ 358:	51 2b       	or	r21, r17
+ 35a:	62 2b       	or	r22, r18
+ 35c:	73 2b       	or	r23, r19
+	//
+	// если отрицательное число - превратить из доп. кода в прямой
+	if((a & data1) == a)
+ 35e:	99 23       	and	r25, r25
+ 360:	24 f5       	brge	.+72     	; 0x3aa <_Z20CalculateCapacitancejj+0x6a>
+	{
+		data = data - 0b1; // отнять единицу
+ 362:	db 01       	movw	r26, r22
+ 364:	ca 01       	movw	r24, r20
+ 366:	01 97       	sbiw	r24, 0x01	; 1
+ 368:	a1 09       	sbc	r26, r1
+ 36a:	b1 09       	sbc	r27, r1
+		data = ~data; // инвертировать
+ 36c:	80 95       	com	r24
+ 36e:	90 95       	com	r25
+ 370:	a0 95       	com	r26
+ 372:	b0 95       	com	r27
+		data = data >> 8; // уменьшить до 24 разрядов
+ 374:	29 2f       	mov	r18, r25
+ 376:	3a 2f       	mov	r19, r26
+ 378:	4b 2f       	mov	r20, r27
+ 37a:	55 27       	eor	r21, r21
+		
+		data = data * 100; // для сохранения дробей до сотых
+ 37c:	a4 e6       	ldi	r26, 0x64	; 100
+ 37e:	b0 e0       	ldi	r27, 0x00	; 0
+ 380:	da d0       	rcall	.+436    	; 0x536 <__muluhisi3>
+		
+		data = data / 0x80000; // получить емкость в пикофарадах
+ 382:	ab 01       	movw	r20, r22
+ 384:	bc 01       	movw	r22, r24
+ 386:	03 2e       	mov	r0, r19
+ 388:	33 e1       	ldi	r19, 0x13	; 19
+ 38a:	76 95       	lsr	r23
+ 38c:	67 95       	ror	r22
+ 38e:	57 95       	ror	r21
+ 390:	47 95       	ror	r20
+ 392:	3a 95       	dec	r19
+ 394:	d1 f7       	brne	.-12     	; 0x38a <_Z20CalculateCapacitancejj+0x4a>
+ 396:	30 2d       	mov	r19, r0
+		data = 3437 - data; // учесть смещение измерений (CAPDAC)
+ 398:	8d e6       	ldi	r24, 0x6D	; 109
+ 39a:	9d e0       	ldi	r25, 0x0D	; 13
+ 39c:	a0 e0       	ldi	r26, 0x00	; 0
+ 39e:	b0 e0       	ldi	r27, 0x00	; 0
+ 3a0:	84 1b       	sub	r24, r20
+ 3a2:	95 0b       	sbc	r25, r21
+ 3a4:	a6 0b       	sbc	r26, r22
+ 3a6:	b7 0b       	sbc	r27, r23
+ 3a8:	16 c0       	rjmp	.+44     	; 0x3d6 <_Z20CalculateCapacitancejj+0x96>
+	}
+	else
+	{
+		data = data >> 8; // уменьшить до 24 разрядов
+ 3aa:	25 2f       	mov	r18, r21
+ 3ac:	36 2f       	mov	r19, r22
+ 3ae:	47 2f       	mov	r20, r23
+ 3b0:	55 27       	eor	r21, r21
+		
+		data = data * 100; // для сохранения дробей до сотых
+ 3b2:	a4 e6       	ldi	r26, 0x64	; 100
+ 3b4:	b0 e0       	ldi	r27, 0x00	; 0
+ 3b6:	bf d0       	rcall	.+382    	; 0x536 <__muluhisi3>
+		
+		data = data / 0x80000; // полученить емкость в пикофарадах
+ 3b8:	dc 01       	movw	r26, r24
+ 3ba:	cb 01       	movw	r24, r22
+ 3bc:	07 2e       	mov	r0, r23
+ 3be:	73 e1       	ldi	r23, 0x13	; 19
+ 3c0:	b6 95       	lsr	r27
+ 3c2:	a7 95       	ror	r26
+ 3c4:	97 95       	ror	r25
+ 3c6:	87 95       	ror	r24
+ 3c8:	7a 95       	dec	r23
+ 3ca:	d1 f7       	brne	.-12     	; 0x3c0 <_Z20CalculateCapacitancejj+0x80>
+ 3cc:	70 2d       	mov	r23, r0
+		data = 3437 + data; // учесть смещение измерений (CAPDAC)
+ 3ce:	83 59       	subi	r24, 0x93	; 147
+ 3d0:	92 4f       	sbci	r25, 0xF2	; 242
+ 3d2:	af 4f       	sbci	r26, 0xFF	; 255
+ 3d4:	bf 4f       	sbci	r27, 0xFF	; 255
+	}
+	
+	return (uint16_t)data; // вернуть младшие 16 бит
+}
+ 3d6:	1f 91       	pop	r17
+ 3d8:	0f 91       	pop	r16
+ 3da:	08 95       	ret
+
+000003dc <main>:
+
+
+
+
+int main(void)
+{	
+ 3dc:	cf 93       	push	r28
+ 3de:	df 93       	push	r29
+ 3e0:	cd b7       	in	r28, 0x3d	; 61
+ 3e2:	de b7       	in	r29, 0x3e	; 62
+ 3e4:	27 97       	sbiw	r28, 0x07	; 7
+ 3e6:	0f b6       	in	r0, 0x3f	; 63
+ 3e8:	f8 94       	cli
+ 3ea:	de bf       	out	0x3e, r29	; 62
+ 3ec:	0f be       	out	0x3f, r0	; 63
+ 3ee:	cd bf       	out	0x3d, r28	; 61
+	uint16_t measuredLsb;
+	uint8_t temp;
+	uint8_t date_time[7]; // массив для часов
+	uint16_t counter; // адресс последней записанной ячейки
+	
+	i2c_init(); // и2с ВКЛ.
+ 3f0:	e8 de       	rcall	.-560    	; 0x1c2 <_Z8i2c_initv>
+	uart_init(MYUBRR); // уарт ВКЛ.
+ 3f2:	85 e0       	ldi	r24, 0x05	; 5
+ 3f4:	90 e0       	ldi	r25, 0x00	; 0
+ 3f6:	87 d0       	rcall	.+270    	; 0x506 <_Z9uart_initj>
+ 3f8:	8f e4       	ldi	r24, 0x4F	; 79
+ 3fa:	93 ec       	ldi	r25, 0xC3	; 195
+ 3fc:	01 97       	sbiw	r24, 0x01	; 1
+ 3fe:	f1 f7       	brne	.-4      	; 0x3fc <main+0x20>
+ 400:	00 c0       	rjmp	.+0      	; 0x402 <__LOCK_REGION_LENGTH__+0x2>
+ 402:	00 00       	nop
+	
+	
+	
+	// ИНИЦИАЛИЗАЦИЯ FCD      CAPDC
+					 // 5432109876543210
+	fcd_write16(0x08, 0b0001000101100000); // в MEAS1_CONF
+ 404:	60 e6       	ldi	r22, 0x60	; 96
+ 406:	71 e1       	ldi	r23, 0x11	; 17
+ 408:	88 e0       	ldi	r24, 0x08	; 8
+ 40a:	a0 de       	rcall	.-704    	; 0x14c <_Z11fcd_write16hj>
+	fcd_write16(0x0C, 0b0000000010000000); // FDC_CONF
+ 40c:	60 e8       	ldi	r22, 0x80	; 128
+ 40e:	70 e0       	ldi	r23, 0x00	; 0
+ 410:	8c e0       	ldi	r24, 0x0C	; 12
+ 412:	9c de       	rcall	.-712    	; 0x14c <_Z11fcd_write16hj>
+ 414:	89 ec       	ldi	r24, 0xC9	; 201
+ 416:	98 e0       	ldi	r25, 0x08	; 8
+ 418:	01 97       	sbiw	r24, 0x01	; 1
+ 41a:	f1 f7       	brne	.-4      	; 0x418 <__LOCK_REGION_LENGTH__+0x18>
+ 41c:	00 c0       	rjmp	.+0      	; 0x41e <__LOCK_REGION_LENGTH__+0x1e>
+ 41e:	00 00       	nop
+	_delay_ms(9);
+	
+	counter = iEEPROM_read16(0x00);
+ 420:	80 e0       	ldi	r24, 0x00	; 0
+ 422:	90 e0       	ldi	r25, 0x00	; 0
+ 424:	63 df       	rcall	.-314    	; 0x2ec <_Z14iEEPROM_read16j>
+ 426:	8c 01       	movw	r16, r24
+	
+	while (1)
+	{	
+		
+		// Триггернуть измерение и подождать пока оно выполнится
+		fcd_write16(0x0C, 0b0000000010000000);
+ 428:	60 e8       	ldi	r22, 0x80	; 128
+ 42a:	70 e0       	ldi	r23, 0x00	; 0
+ 42c:	8c e0       	ldi	r24, 0x0C	; 12
+ 42e:	8e de       	rcall	.-740    	; 0x14c <_Z11fcd_write16hj>
+		while((FDC1004_read(0x0C) & 0b0000000000001000) != 0b0000000000001000)
+ 430:	8c e0       	ldi	r24, 0x0C	; 12
+ 432:	b0 de       	rcall	.-672    	; 0x194 <_Z12FDC1004_readh>
+ 434:	83 fd       	sbrc	r24, 3
+ 436:	07 c0       	rjmp	.+14     	; 0x446 <__LOCK_REGION_LENGTH__+0x46>
+ 438:	89 ec       	ldi	r24, 0xC9	; 201
+ 43a:	98 e0       	ldi	r25, 0x08	; 8
+ 43c:	01 97       	sbiw	r24, 0x01	; 1
+ 43e:	f1 f7       	brne	.-4      	; 0x43c <__LOCK_REGION_LENGTH__+0x3c>
+ 440:	00 c0       	rjmp	.+0      	; 0x442 <__LOCK_REGION_LENGTH__+0x42>
+ 442:	00 00       	nop
+ 444:	f5 cf       	rjmp	.-22     	; 0x430 <__LOCK_REGION_LENGTH__+0x30>
+		{
+			_delay_ms(9);
+		}
+		
+		// прочитать результаты измерения
+		measuredMsb = FDC1004_read(0x00);
+ 446:	80 e0       	ldi	r24, 0x00	; 0
+ 448:	a5 de       	rcall	.-694    	; 0x194 <_Z12FDC1004_readh>
+ 44a:	7c 01       	movw	r14, r24
+		measuredLsb = FDC1004_read(0x01);
+ 44c:	81 e0       	ldi	r24, 0x01	; 1
+ 44e:	a2 de       	rcall	.-700    	; 0x194 <_Z12FDC1004_readh>
+		
+		// посчитать емкость без учета температуры
+		capacitance = CalculateCapacitance(measuredMsb, measuredLsb);
+ 450:	bc 01       	movw	r22, r24
+ 452:	c7 01       	movw	r24, r14
+ 454:	75 df       	rcall	.-278    	; 0x340 <_Z20CalculateCapacitancejj>
+ 456:	7c 01       	movw	r14, r24
+		
+		// прочитать температуру 
+		while(!(TC74_IsReady()));
+ 458:	39 d0       	rcall	.+114    	; 0x4cc <_Z12TC74_IsReadyv>
+ 45a:	88 23       	and	r24, r24
+ 45c:	e9 f3       	breq	.-6      	; 0x458 <__LOCK_REGION_LENGTH__+0x58>
+		temp = TC74_read();
+ 45e:	43 d0       	rcall	.+134    	; 0x4e6 <_Z9TC74_readv>
+		
+		// учесть погрешность измерения из-за температуры
+		capacitance = IncludeTemperatureOffset(temp, capacitance);
+ 460:	b7 01       	movw	r22, r14
+ 462:	59 df       	rcall	.-334    	; 0x316 <_Z24IncludeTemperatureOffsethj>
+ 464:	f8 2e       	mov	r15, r24
+ 466:	e9 2e       	mov	r14, r25
+		
+		// считать дату и время
+		ds1307_read_time_date(date_time);
+ 468:	ce 01       	movw	r24, r28
+ 46a:	01 96       	adiw	r24, 0x01	; 1
+ 46c:	e5 dd       	rcall	.-1078   	; 0x38 <_Z21ds1307_read_time_datePh>
+		
+		// записать дату и время в еепром
+		eep_write_byte(counter, date_time[4]); // число
+ 46e:	6d 81       	ldd	r22, Y+5	; 0x05
+ 470:	c8 01       	movw	r24, r16
+ 472:	42 de       	rcall	.-892    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+1, date_time[5]); // месяц
+ 474:	6e 81       	ldd	r22, Y+6	; 0x06
+ 476:	c8 01       	movw	r24, r16
+ 478:	01 96       	adiw	r24, 0x01	; 1
+ 47a:	3e de       	rcall	.-900    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+2, date_time[6]); // год
+ 47c:	6f 81       	ldd	r22, Y+7	; 0x07
+ 47e:	c8 01       	movw	r24, r16
+ 480:	02 96       	adiw	r24, 0x02	; 2
+ 482:	3a de       	rcall	.-908    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+3, date_time[2]); // час
+ 484:	6b 81       	ldd	r22, Y+3	; 0x03
+ 486:	c8 01       	movw	r24, r16
+ 488:	03 96       	adiw	r24, 0x03	; 3
+ 48a:	36 de       	rcall	.-916    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+4, date_time[1]); // минута
+ 48c:	6a 81       	ldd	r22, Y+2	; 0x02
+ 48e:	c8 01       	movw	r24, r16
+ 490:	04 96       	adiw	r24, 0x04	; 4
+ 492:	32 de       	rcall	.-924    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+5, date_time[0]); // секунда
+ 494:	69 81       	ldd	r22, Y+1	; 0x01
+ 496:	c8 01       	movw	r24, r16
+ 498:	05 96       	adiw	r24, 0x05	; 5
+ 49a:	2e de       	rcall	.-932    	; 0xf8 <_Z14eep_write_bytejh>
+		// записать емкость в еепром
+		eep_write_byte(counter+6, capacitance >> 8 );
+ 49c:	6e 2d       	mov	r22, r14
+ 49e:	c8 01       	movw	r24, r16
+ 4a0:	06 96       	adiw	r24, 0x06	; 6
+ 4a2:	2a de       	rcall	.-940    	; 0xf8 <_Z14eep_write_bytejh>
+		eep_write_byte(counter+7, capacitance );
+ 4a4:	6f 2d       	mov	r22, r15
+ 4a6:	c8 01       	movw	r24, r16
+ 4a8:	07 96       	adiw	r24, 0x07	; 7
+ 4aa:	26 de       	rcall	.-948    	; 0xf8 <_Z14eep_write_bytejh>
+		
+		// увеличить счетчик и записать его в еепром МК
+		counter+=8;
+ 4ac:	08 5f       	subi	r16, 0xF8	; 248
+ 4ae:	1f 4f       	sbci	r17, 0xFF	; 255
+		iEEPROM_write16(0x00, counter);
+ 4b0:	b8 01       	movw	r22, r16
+ 4b2:	80 e0       	ldi	r24, 0x00	; 0
+ 4b4:	90 e0       	ldi	r25, 0x00	; 0
+ 4b6:	04 df       	rcall	.-504    	; 0x2c0 <_Z15iEEPROM_write16jj>
+ 4b8:	97 e6       	ldi	r25, 0x67	; 103
+ 4ba:	2a e1       	ldi	r18, 0x1A	; 26
+ 4bc:	8f e0       	ldi	r24, 0x0F	; 15
+ 4be:	91 50       	subi	r25, 0x01	; 1
+ 4c0:	20 40       	sbci	r18, 0x00	; 0
+ 4c2:	80 40       	sbci	r24, 0x00	; 0
+ 4c4:	e1 f7       	brne	.-8      	; 0x4be <__stack+0x5f>
+ 4c6:	00 c0       	rjmp	.+0      	; 0x4c8 <__stack+0x69>
+ 4c8:	00 00       	nop
+ 4ca:	ae cf       	rjmp	.-164    	; 0x428 <__LOCK_REGION_LENGTH__+0x28>
+
+000004cc <_Z12TC74_IsReadyv>:
+	i2c_start();
+	i2c_send_addr(TC74_WRITE); // адресс датчика
+	i2c_send_byte(0x01); // адресс регистра конфигурации
+	i2c_send_byte(data); // данные в регистр
+	i2c_stop();
+}
+ 4cc:	82 de       	rcall	.-764    	; 0x1d2 <_Z9i2c_startv>
+ 4ce:	8a e9       	ldi	r24, 0x9A	; 154
+ 4d0:	91 de       	rcall	.-734    	; 0x1f4 <_Z13i2c_send_addrh>
+ 4d2:	81 e0       	ldi	r24, 0x01	; 1
+ 4d4:	a2 de       	rcall	.-700    	; 0x21a <_Z13i2c_send_byteh>
+ 4d6:	7d de       	rcall	.-774    	; 0x1d2 <_Z9i2c_startv>
+ 4d8:	8b e9       	ldi	r24, 0x9B	; 155
+ 4da:	8c de       	rcall	.-744    	; 0x1f4 <_Z13i2c_send_addrh>
+ 4dc:	e2 de       	rcall	.-572    	; 0x2a2 <_Z11i2c_readNakv>
+ 4de:	86 fb       	bst	r24, 6
+ 4e0:	88 27       	eor	r24, r24
+ 4e2:	80 f9       	bld	r24, 0
+ 4e4:	08 95       	ret
+
+000004e6 <_Z9TC74_readv>:
+
+uint8_t TC74_read()
+{
+ 4e6:	cf 93       	push	r28
+	uint8_t status;
+	status = i2c_start();
+ 4e8:	74 de       	rcall	.-792    	; 0x1d2 <_Z9i2c_startv>
+	status = i2c_send_addr(TC74_WRITE);
+ 4ea:	8a e9       	ldi	r24, 0x9A	; 154
+ 4ec:	83 de       	rcall	.-762    	; 0x1f4 <_Z13i2c_send_addrh>
+	status = i2c_send_byte(0x00);
+ 4ee:	80 e0       	ldi	r24, 0x00	; 0
+ 4f0:	94 de       	rcall	.-728    	; 0x21a <_Z13i2c_send_byteh>
+	status = i2c_start();
+ 4f2:	6f de       	rcall	.-802    	; 0x1d2 <_Z9i2c_startv>
+	status = i2c_send_addr(TC74_READ);
+ 4f4:	8b e9       	ldi	r24, 0x9B	; 155
+ 4f6:	7e de       	rcall	.-772    	; 0x1f4 <_Z13i2c_send_addrh>
+	uint8_t data = i2c_readNak();
+ 4f8:	d4 de       	rcall	.-600    	; 0x2a2 <_Z11i2c_readNakv>
+ 4fa:	c8 2f       	mov	r28, r24
+	uart_send_byte(data);
+ 4fc:	0c d0       	rcall	.+24     	; 0x516 <_Z14uart_send_byteh>
+	i2c_stop();
+ 4fe:	77 de       	rcall	.-786    	; 0x1ee <_Z8i2c_stopv>
+	return data;
+}
+ 500:	8c 2f       	mov	r24, r28
+ 502:	cf 91       	pop	r28
+ 504:	08 95       	ret
+
+00000506 <_Z9uart_initj>:
+#include "main.h"
+
+//настройка уарт 8 бит данных, проверка четности откл., 1 стоп бит.
+void uart_init(uint16_t ubrr) {
+// --------- настройка скорости ака BAUD RATE ---------------------
+UBRRH = (uint8_t)(ubrr>>8);
+ 506:	90 bd       	out	0x20, r25	; 32
+UBRRL = (uint8_t)ubrr;
+ 508:	89 b9       	out	0x09, r24	; 9
+//-----------------------------------------------------------------
+UCSRB |= (1<<TXEN); // включение передатчика
+ 50a:	53 9a       	sbi	0x0a, 3	; 10
+UCSRB |= (1<<RXEN); // включение приемника
+ 50c:	54 9a       	sbi	0x0a, 4	; 10
+// в бите URSEL должна быть 1, если хотим читать регистр UCSRC, а мы хотим :)
+UCSRC |= (1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0); // 8 бит данных в посылке.
+ 50e:	80 b5       	in	r24, 0x20	; 32
+ 510:	86 68       	ori	r24, 0x86	; 134
+ 512:	80 bd       	out	0x20, r24	; 32
+ 514:	08 95       	ret
+
+00000516 <_Z14uart_send_byteh>:
+
+
+
+// отправка байта
+void uart_send_byte(uint8_t data) {
+	while (!(UCSRA & (1 << UDRE))); // Ожидание освобождения буфера отправки
+ 516:	5d 9b       	sbis	0x0b, 5	; 11
+ 518:	fe cf       	rjmp	.-4      	; 0x516 <_Z14uart_send_byteh>
+	UDR = data; // записывает байт в буфер, отправка начинается автоматически.
+ 51a:	8c b9       	out	0x0c, r24	; 12
+ 51c:	08 95       	ret
+
+0000051e <__umulhisi3>:
+ 51e:	a2 9f       	mul	r26, r18
+ 520:	b0 01       	movw	r22, r0
+ 522:	b3 9f       	mul	r27, r19
+ 524:	c0 01       	movw	r24, r0
+ 526:	a3 9f       	mul	r26, r19
+ 528:	01 d0       	rcall	.+2      	; 0x52c <__umulhisi3+0xe>
+ 52a:	b2 9f       	mul	r27, r18
+ 52c:	70 0d       	add	r23, r0
+ 52e:	81 1d       	adc	r24, r1
+ 530:	11 24       	eor	r1, r1
+ 532:	91 1d       	adc	r25, r1
+ 534:	08 95       	ret
+
+00000536 <__muluhisi3>:
+ 536:	f3 df       	rcall	.-26     	; 0x51e <__umulhisi3>
+ 538:	a5 9f       	mul	r26, r21
+ 53a:	90 0d       	add	r25, r0
+ 53c:	b4 9f       	mul	r27, r20
+ 53e:	90 0d       	add	r25, r0
+ 540:	a4 9f       	mul	r26, r20
+ 542:	80 0d       	add	r24, r0
+ 544:	91 1d       	adc	r25, r1
+ 546:	11 24       	eor	r1, r1
+ 548:	08 95       	ret
+
+0000054a <_exit>:
+ 54a:	f8 94       	cli
+
+0000054c <__stop_program>:
+ 54c:	ff cf       	rjmp	.-2      	; 0x54c <__stop_program>
